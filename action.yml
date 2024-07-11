@@ -1,0 +1,33 @@
+name: TGOPS Deploy
+description: Deploy a project using TGOPS
+inputs:
+  env:
+    description: Deploy environment
+    required: true
+    type: string
+  tgops-token:
+    description: Secret token with permission to access the TGOPS repository artifacts
+    required: true
+    type: string
+  deploy-token:
+    description: Kubernetes service account token
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Download tgops executable
+      uses: dawidd6/action-download-artifact@v6
+      with:
+        github_token: ${{inputs.tgops-token}}
+        name: tgops
+        repo: tweedegolf/tgops
+        workflow: build.yml
+        search_artifacts: true
+
+    - name: Run tgops deploy
+      run: chmod +x ./tgops && ./tgops deploy --force
+      env:
+        ENV: ${{inputs.env}}
+        DEPLOY_TOKEN: ${{inputs.deploy-token}}
