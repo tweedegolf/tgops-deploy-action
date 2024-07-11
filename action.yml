@@ -28,6 +28,7 @@ runs:
 
     - name: Run tgops deploy
       run: chmod +x ./tgops && ./tgops deploy --force
+      shell: bash
       env:
         ENV: ${{inputs.env}}
         DEPLOY_TOKEN: ${{inputs.deploy-token}}
