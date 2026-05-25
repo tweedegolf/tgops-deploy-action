@@ -18,13 +18,18 @@ runs:
   using: composite
   steps:
     - name: Download tgops executable
-      uses: dawidd6/action-download-artifact@v6
-      with:
-        github_token: ${{inputs.tgops-token}}
-        name: tgops
-        repo: tweedegolf/tgops
-        workflow: build.yml
-        search_artifacts: true
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.tgops-token }}
+      run: |
+        run_id=$(gh run list \
+          --repo tweedegolf/tgops \
+          --workflow build.yml \
+          --status success \
+          --limit 1 \
+          --json databaseId \
+          --jq '.[0].databaseId')
+        gh run download "$run_id" --repo tweedegolf/tgops --name tgops
 
     - name: Run tgops deploy
       run: chmod +x ./tgops && ./tgops deploy --force
